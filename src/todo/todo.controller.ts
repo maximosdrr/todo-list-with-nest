@@ -8,7 +8,7 @@ import {
   Query,
   Put,
 } from '@nestjs/common';
-import { Todo } from './user.entity';
+import { Todo } from './interfaces/todo.entity';
 import { TodoService } from './todo.service';
 import { InsertResult, DeleteResult, UpdateResult } from 'typeorm';
 
@@ -16,34 +16,31 @@ import { InsertResult, DeleteResult, UpdateResult } from 'typeorm';
 export class TodoController {
   constructor(private todoService: TodoService) {}
 
-  @Get('findAll')
+  @Get()
   async findAll(): Promise<Todo[]> {
     return await this.todoService.findAll();
   }
 
-  @Get('findOne')
-  async findOne(@Query() id: string): Promise<Todo> {
+  @Get(':id')
+  async findOne(@Param('id') id: string): Promise<Todo> {
     return await this.todoService.findOne(id);
   }
 
-  @Delete('delete')
-  async remove(@Query() id: string): Promise<DeleteResult> {
-    const result: DeleteResult = await this.todoService.remove(id);
-    return result;
-  }
-
-  @Post('create')
+  @Post()
   async create(@Body() todo: Todo): Promise<InsertResult> {
-    const result: InsertResult = await this.todoService.create(todo);
-    return result;
+    return await this.todoService.create(todo);
   }
 
-  @Put('update')
+  @Put(':id')
   async update(
     @Body() todo: Todo,
-    @Query('id') id: string,
+    @Param('id') id: string,
   ): Promise<UpdateResult> {
-    const result: UpdateResult = await this.todoService.update(todo, id);
-    return result;
+    return await this.todoService.update(todo, id);
+  }
+
+  @Delete(':id')
+  async remove(@Param('id') id: string): Promise<DeleteResult> {
+    return await this.todoService.remove(id);
   }
 }
